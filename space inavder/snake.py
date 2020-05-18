@@ -29,15 +29,14 @@ playerY = 480
 playerX_change = 0
 
 #enemy
-enemyImg=[]
 enemyX=[]
 enemyY=[]
 enemyX_change=[]
 enemyY_change=[]
 no_of_enemyship=4
+enemyImg = pygame.image.load('invaders.png')
 
-for i in range(no_of_enemyship):
-	enemyImg.append(pygame.image.load('invaders.png'))
+for i in range(no_of_enemyship):	
 	enemyX.append(random.randint(0,735))
 	enemyY.append(random.randint(50,150))
 	enemyX_change.append(4)
@@ -53,6 +52,7 @@ bulletY_change = 5
 bullet_state = "ready"
 
 #score
+global score_value
 score_value=0
 font = pygame.font.Font('freesansbold.ttf',32)
 textX = 10
@@ -61,9 +61,18 @@ textY = 10
 #game over text
 over_font = pygame.font.Font('freesansbold.ttf',64)
 
-def show_score(x,y):
+#levelUP
+currentLevelScore=0
+level=1
+levelfont = pygame.font.Font('freesansbold.ttf',15)
+levelUP = False
+
+
+def show_score(x,y,l):
 	score = font.render("Score :"+str(score_value),True,(255,255,255))
 	screen.blit(score,(x,y))
+	lvl = levelfont.render("Level :"+str(l),True,(255,255,255))
+	screen.blit(lvl,(x,y+35))
 
 def game_over_text():
 	over_text= font.render("GAME OVER",True,(255,255,255))
@@ -73,7 +82,7 @@ def player(x,y):
 	screen.blit(playerImg,(x,y))
 
 def enemy(x,y,i):
-	screen.blit(enemyImg[i],(x,y))
+	screen.blit(enemyImg,(x,y))
 
 def fire_bullet(x,y):
 	global bullet_state
@@ -164,13 +173,28 @@ while running:
 			bulletY = 480
 			bullet_state = "ready"
 			score_value+=1
+			currentLevelScore+=1
+
+			if currentLevelScore>15:
+				currentLevelScore=0
+				level+=1
+				enemyX[i] = random.randint(0,736)
+				enemyY[i] = random.randint(50,150)
+				enemy(enemyX[i],enemyY[i],i)
+				levelUP = True
+
 			enemyX[i] = random.randint(0,736)
 			enemyY[i] = random.randint(50,150)
 		enemy(enemyX[i],enemyY[i],i)
 
 	
-
+	if levelUP:
+		levelUP = False
+		no_of_enemyship+=1
+		enemyX.append(random.randint(0,736))
+		enemyY.append(random.randint(50,150))
+		enemy(enemyX[-1],enemyY[-1],i)
 
 	player(playerX,playerY)
-	show_score(textX,textY)
+	show_score(textX,textY,level)
 	pygame.display.update()
